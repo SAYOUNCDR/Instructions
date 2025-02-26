@@ -1,0 +1,12 @@
+1. Create a folder src
+2. create a file name it as main.css or input.css
+->import tailwind CSS ->@import "tailwindcss"; (in input.css)
+3.create html file in src folder for html code
+4.install tailwind css-
+->npm install tailwindcss @tailwindcss/cli
+5.run build command for tailwind css
+->npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch
+->replace input.css with your css or name ur css as input.css
+->replace filename as per css file
+e.g ./src./input.css or ur filename rest command same
+6. inside html link a css output.css in same folder src 

@@ -1,0 +1,15 @@
+1. you have to be inside the main folder
+2. git --version 
+3. git init
+4. git add .
+5. git commit -m "Msg"
+6. create a repo on GitHub and copy the link of the repo
+7. git remote add origin url
+8. if error
+//git pull --> enter these command
+git pull origin main
+git pull origin main --allow-unrelated-histories
+git push -u origin main
+
+9. git branch -M main
+10. git push -u origin main
