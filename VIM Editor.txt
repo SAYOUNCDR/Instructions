@@ -1,0 +1,61 @@
+Vim Essential Commands
+
+Basic Modes
+
+i → Enter Insert Mode (for editing text)
+
+Esc → Exit Insert Mode
+
+Saving & Exiting
+
+:wq → Save and exit
+
+:q! → Quit without saving
+
+Navigation
+
+Shift + G → Go to the last line
+
+gg → Go to the first line
+
+Searching & Replacing
+
+/word → Search for a specific string (Escape to exit search mode)
+
+:%s/word1/word2/g → Replace all occurrences of word1 with word2
+
+Undo & Redo
+
+U → Undo all changes (Press Esc to exit all modes before using)
+
+Ctrl + R → Redo
+
+Editing & Inserting
+
+o → Insert a new line below the cursor and enter Insert Mode
+
+Shift + O → Insert a new line above the cursor and enter Insert Mode
+
+Shift + I → Edit at the beginning of the current line
+
+Shift + A → Edit at the end of the current line
+
+Cut, Copy, & Paste
+
+dd → Cut/Delete the current line (Esc to exit modes first)
+
+p → Paste below the cursor
+
+Shift + P → Paste above the cursor
+
+Shift + V → Select a line (Visual Mode) → p to paste
+
+Working with Multiple Files
+
+vim -o file1 file2 → Open multiple files in a split view
+
+Ctrl + W → Switch between files
+
+Comparing Files
+
+vim -d file1 file2 → Open two files side by side to compare differences

@@ -1,0 +1,13 @@
+wsl -d ubuntu (distroname)
+wsl --list --verbose (to check running machines)
+wsl --shutdown (shutdown all machines)
+wsl --terminate ubuntu (to close only specific distro)
+wsl --unregister ubuntu ( to uninstall ubuntu )
+
+--To use windows file inside wsl Linux machine
+ cd /mnt/c ( this is c drive )
+cd Users/Sayoun ( to get inside main user)
+
+-- to open windows explorer current location
+ explorer.exe . (type this cmd inside the wsl)
+
