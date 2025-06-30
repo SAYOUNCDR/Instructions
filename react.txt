@@ -1,0 +1,17 @@
+1. > npm create vite@latest
+
+✔️ project  name
+✔️ Select "React"
+✔️ Choose "JavaScript" or "TypeScript" variant
+
+2. cd project name
+
+3. npm install (Install dependencies)
+
+4. > npm install react@latest react-dom@latest  (Install the latest version of React (React 19))
+
+5. > npm run dev  (Start the development server)
+
+->  Visit: http://localhost:5173
+
+ 
