@@ -1,17 +1,368 @@
-1. > npm create vite@latest
 
-✔️ project  name
-✔️ Select "React"
-✔️ Choose "JavaScript" or "TypeScript" variant
+React Vite Project Setup & Basics
+==================================
 
-2. cd project name
+🚀 Project Setup
+----------------
+1. Create Vite Project
+   npm create vite@latest
+   - Enter project name
+   - Select React
+   - Choose JavaScript or TypeScript variant
 
-3. npm install (Install dependencies)
+2. Navigate to Project
+   cd project-name
 
-4. > npm install react@latest react-dom@latest  (Install the latest version of React (React 19))
+3. Install Dependencies
+   npm install
 
-5. > npm run dev  (Start the development server)
+4. Install Latest React (React 19)
+   npm install react@latest react-dom@latest
 
-->  Visit: http://localhost:5173
+5. Start Development Server
+   npm run dev
+   Visit: http://localhost:5173
+
+
+📂 Project Structure
+--------------------
+project-name/
+├── index.html
+└── src/
+    ├── main.jsx
+    ├── App.jsx
+    └── components/
+        └── Comp-01.jsx
+
+Component Flow:
+Component → App.jsx → main.jsx → index.html
+
+
+⚙️ React Basics
+---------------
+1. Component Naming
+   - Component names must start with Capital Letters.
+
+2. Component Syntax
+   const ComponentName = () => {
+     return (
+       <div>
+         {/* Content here */}
+       </div>
+     );
+   };
+
+3. Exporting Components
+   export default ComponentName;
+
+4. Using Components
+   Import in App.jsx:
+   import ComponentName from './components/ComponentName.jsx';
+
+   Use inside App:
+   const App = () => {
+     return (
+       <div>
+         <ComponentName />
+       </div>
+     );
+   };
+
+   export default App;
+
+5. Single Parent Element
+   - Each component must return exactly one parent element.
+
+6. JSX Syntax Differences
+   HTML Attribute   JSX Equivalent
+   --------------   --------------
+   class            className
+   for              htmlFor
+   id               id
+
+7. Expressions in JSX
+   - Write JavaScript expressions inside {}:
+     <p>{2 + 2}</p> // Outputs: 4
+
+   - Dynamic class names:
+     <div className={dynamicClass}></div>
+
+8. Rendering Lists
+   const items = ['Item1', 'Item2', 'Item3'];
+
+   export const List = () => {
+     return (
+       <div>
+         <ol>
+           {items.map((item, index) => (
+             <li key={index}>{item}</li>
+           ))}
+         </ol>
+       </div>
+     );
+   };
+
+9. Destructuring Array of Objects in Components
+   const users = [
+     { name: 'Alice', email: 'alice@example.com', location: 'NY', jobRole: 'Developer' },
+     { name: 'Bob', email: 'bob@example.com', location: 'LA', jobRole: 'Designer' },
+   ];
+
+   export const UserList = () => {
+     return (
+       <div>
+         {users.map(({ name, email, location, jobRole }, index) => (
+           <ol key={index}>
+             <li>Name: {name}</li>
+             <li>Email: {email}</li>
+             <li>Location: {location}</li>
+             <li>Job Role: {jobRole}</li>
+           </ol>
+         ))}
+       </div>
+     );
+   };
+
+10. Props (Properties)
+    - Props are arguments passed from a parent to a child component.
+
+    Passing Props from Parent:
+    <PropsChild name="Sayoun" gmail="0xSYN.dev@gmail.com" />
+
+    Using Props in Child (Destructuring):
+    export const PropsChild = ({ name, gmail }) => {
+      return (
+        <div>
+          <p>{name}</p>
+          <p>{gmail}</p>
+        </div>
+      );
+    };
+
+11. Conditional Rendering
+    - Conditionally display different components or content based on props or state.
+
+    Passing Prop from Parent:
+    <ConditionalRender isValid={false} />
+
+    Conditional Rendering in Child:
+    const ValidPassword = () => <h1>Valid Password</h1>;
+    const InvalidPassword = () => <h1>Invalid Password</h1>;
+
+    export const ConditionalRender = ({ isValid }) => {
+      if (isValid) {
+        return <ValidPassword />;
+      }
+      return <InvalidPassword />;
+    };
+
+
+
+12. Styling IN JSX
+	a- Inline Style [use two {{}} in inline ] -  <h1 style={{color: "red", textAlign:"center"}}>Inline Style</h1
+
+	b- JS object as style 
+	    	const styles = {
+  			color: "green",
+  			backgroundColor: "crimson",
+  			padding: "2rem",
+  			textAlign: "center",
+		};
+		
+		//Using it in the Component
+		<h2 style={styles}>JS Object as style</h2>
+	
+	c- CSS importing index.css
+		import("./index.css");
+
+13. Icons [Libraries]
+
+		a- React Icons [Use by installing]
+			npm install react-icons
+			
+			//Importing icon
+			import { DiLinux } from "react-icons/di";
+
+			//Using icon
+			<DiLinux siize={30} color="white"/>
+
+
+
+14. Event handler
+
+a-onClick()
+export const EventHandler = () => {
+  const handleClick = () => {
+    return console.log("haandleClick button clicked!");
+  };
+  return <button onClick={handleClick}>Click</button>;
+};
+
+b-onCopy()
+	<p onCopy={copyhandler}>Don't coy the paragraph</p>
+
+
+
+15. STATE and HOOKS
+
+ -State is a way to store and manage data that can change over time and affects how the components renders. We define state using the useState Hook, which allows you to set an initial value and provides a way to update that state.
+
+-Hooks are a new addition in react 16.8 They let you use state and other React features without writing a class.
+
+
+-What is useState() - it is a hook which allows us to track state in a functional component. State generally refers to data or properties that need to be tracking in an application.
+
+syntax - const [data , changeData]= useState()
+
+
+
+1. useState with normal numbers
+import { useState } from "react";
+export const StatesHooks = () => {
+  const [count, setcount] = useState(0);
+
+  const increment = () => setcount(count + 1);
+  const decrement = () => setcount(count - 1);
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+    </div>
+  );
+};
+
+
+2. useState with array
+  const [friends, setFriends] = useState(["Sayoun", "Alex", "John", "Michel"]);
+  const addNewFriend = () => setFriends([...friends, "New Friend"]);
+  const removeFriend = () => setFriends(friends.filter((f) => f != "John"));
+  const updateFriend = () => {
+    setFriends(friends.map((f) => (f === "Alex" ? "Alex Smith" : f)));
+  };
+
+
+3. usestate with object
+  const [movie, setMovie] = useState({
+    title: "Endagame",
+    ratings: 9.8,
+  });
+
+  const handleClickRating = () => {
+    //update long way
+    // const copymovies = {
+    //   ...movie,
+    //   ratings: 5,
+    // };
+    // setMovie(copymovies);
+
+    //update object short hand way
+    setMovie({ ...movie, ratings: 10 });
+  };
+
+4. useState with array of objects
+  const [arrayMovies, setarrayMovies] = useState([
+    { id: 1, title: "Avangers: EndGame", ratings: 9.8 },
+    { id: 2, title: "Spider-man HomeComing", ratings: 8.9 },
+  ]);
+
+  const changeName = () => {
+    setarrayMovies(
+      arrayMovies.map((m) =>
+        m.id === 1 ? { ...arrayMovies, title: "John Wick 4" , ratings: 9 } : m
+      )
+    );
+  };
 
  
+Share State into another component
+
+//This is from parent Component
+ <Comp1 count={count} onClickHandler={() => setCount(count + 1)} /> 
+
+
+---------This is comp1
+-Below is child comp code click and onClickHandler are destructured in child and used
+export const Comp1 = ({ count, onClickHandler }) => {
+  const handleClick = onClickHandler;
+  return (
+    <div>
+      <h3>Comp1 Counter</h3>
+      <p>{count}</p>
+      <button onClick={handleClick}> + </button>
+    </div>
+  );
+};
+
+------ This is comp2
+
+export const Comp2 = ({ count, onClickHandler }) => {
+  const handleClick = onClickHandler;
+  return (
+    <div>
+      <h3>Comp1 Counter</h3>
+      <p>{count}</p>
+      <button onClick={handleClick}> + </button>
+    </div>
+  );
+};
+
+
+clicking one will update both 	
+
+
+
+
+-Passing arrow function in useState
+import { useState } from "react";
+
+export const ArrowUseState = () => {
+  const [count, setCount] = useState(() => {
+    const initialCount = 10;
+    return initialCount;
+  });
+
+  const increment = () => {
+    setCount((prevCount) => prevCount + 1);
+  };
+    return <div>
+        <h1>Counr: {count}</h1>
+        <button onClick={increment}>Increment</button>
+  </div>;
+};
+
+
+-Another example 
+  const [randomNumber, setRandomNumber] = useState(() => {
+    const randomNumber = Math.floor(Math.random() * 100);
+    return randomNumber;
+  });
+
+  const generateRandomNumber = () => {
+    const newNumber = Math.floor(Math.random() * 100);
+    setRandomNumber(newNumber);
+  };
+
+
+
+
+
+
+Note - can't we change the count value without setCount like count ++ ; 
+ 	The answer is no cause behind the scene the counter will update but ui will not that's why setCount is used it will re-render that part of the ui.
+
+
+
+--2:14:29
+
+
+- Quick Summary:
+-----------------
+| Feature                |           Description                |
+|------------------------|------------------------------------- |
+| Vite Setup             | Fast React project setup             |
+| Component Structure    | Must start with Capital Letters      |
+| JSX Rules              | className, htmlFor differences       |
+| Props                  | Data passed from parent to child     |
+| List Rendering         | Using .map() with key prop           |
+| Conditional Rendering  | Dynamic UI based on logic/props      |

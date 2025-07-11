@@ -1,0 +1,659 @@
+MongoDB Documentation for MERN Stack Backend
+
+Table of Contents
+1. MongoDB Shell Commands
+2. MongoDB with Node.js and Express
+3. Mongoose Setup
+4. Schema and Model Creation
+5. CRUD Operations
+6. Query Operators
+7. Advanced Queries
+8. Best Practices
+
+===============================================================================
+
+MongoDB Shell Commands
+
+1. Starting MongoDB Shell
+mongosh
+
+2. Database Operations
+// Show all databases
+show dbs
+
+// Create and use a new database
+use newDb
+
+// Show current database
+db
+
+// Drop current database
+db.dropDatabase()
+
+Note: Empty databases won't appear in `show dbs` until they contain at least one document.
+
+3. Collection Operations
+// Show all collections in current database
+show collections
+
+// Create collection explicitly
+db.createCollection("collectionName")
+
+// Drop collection
+db.collectionName.drop()
+
+4. Document Operations
+
+Insert Operations
+// Insert single document
+db.collectionName.insertOne({name: "Sayoun", age: 21})
+
+// Insert multiple documents
+db.collectionName.insertMany([
+  {name: "John", age: 25},
+  {name: "Jane", age: 23},
+  {name: "Bob", age: 30}
+])
+
+Read Operations
+// Find all documents
+db.collectionName.find({})
+
+// Find documents with specific criteria
+db.collectionName.find({name: "Sayoun"})
+
+// Find with limit
+db.collectionName.find({name: "Sayoun"}).limit(1)
+
+// Find one document
+db.collectionName.findOne({name: "Sayoun"})
+
+// Pretty print results
+db.collectionName.find({}).pretty()
+
+Update Operations
+// Update single document
+db.collectionName.updateOne(
+  {name: "Sayoun"}, 
+  {$set: {name: "Sayoun Parui"}}
+)
+
+// Update multiple documents
+db.collectionName.updateMany(
+  {name: "Sayoun"}, 
+  {$set: {name: "Sayoun Parui"}}
+)
+
+// Replace entire document
+db.collectionName.replaceOne(
+  {name: "Sayoun"}, 
+  {name: "New Name", age: 25}
+)
+
+Delete Operations
+// Delete first document in collection
+db.collectionName.deleteOne()
+
+// Delete specific document
+db.collectionName.deleteOne({name: "Sayoun"})
+
+// Delete multiple documents
+db.collectionName.deleteMany({name: "Sayoun"})
+
+// Delete all documents in collection
+db.collectionName.deleteMany({})
+
+===============================================================================
+
+MongoDB with Node.js and Express
+
+1. Project Setup
+// Initialize project
+npm init -y
+
+// Install dependencies
+npm install express mongoose dotenv
+npm install -D nodemon
+
+2. Environment Configuration
+Create .env file:
+MONGODB_URI=mongodb://127.0.0.1:27017/yourDbName
+PORT=3000
+
+3. Basic Express Server Setup
+// app.js
+const express = require('express');
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.get('/', (req, res) => {
+  res.json({ message: 'Server is running!' });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+===============================================================================
+
+Mongoose Setup
+
+1. Database Connection
+// db/connection.js
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB Connected Successfully');
+  } catch (error) {
+    console.error('Database Connection Error:', error);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+
+2. Using Connection in Main App
+// app.js
+const connectDB = require('./db/connection');
+
+// Connect to database
+connectDB();
+
+===============================================================================
+
+Schema and Model Creation
+
+1. Basic Schema Definition
+// models/User.js
+const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+    trim: true,
+    minlength: [2, 'Name must be at least 2 characters'],
+    maxlength: [50, 'Name cannot exceed 50 characters']
+  },
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+    lowercase: true,
+    validate: {
+      validator: function(email) {
+        return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
+      },
+      message: 'Please enter a valid email'
+    }
+  },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: [6, 'Password must be at least 6 characters']
+  },
+  age: {
+    type: Number,
+    min: [0, 'Age cannot be negative'],
+    max: [120, 'Age cannot exceed 120']
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
+}, {
+  timestamps: true // Adds createdAt and updatedAt fields
+});
+
+// Create model
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
+
+2. Schema Data Types
+const sampleSchema = new mongoose.Schema({
+  stringField: String,
+  numberField: Number,
+  dateField: Date,
+  booleanField: Boolean,
+  arrayField: [String],
+  objectField: {
+    nestedString: String,
+    nestedNumber: Number
+  },
+  mixedField: mongoose.Schema.Types.Mixed,
+  objectIdField: mongoose.Schema.Types.ObjectId
+});
+
+===============================================================================
+
+CRUD Operations
+
+1. Create Operations
+// Create single document
+const createUser = async (userData) => {
+  try {
+    const user = new User(userData);
+    const savedUser = await user.save();
+    return savedUser;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Alternative: Using create method
+const createUserAlt = async (userData) => {
+  try {
+    const user = await User.create(userData);
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Create multiple documents
+const createMultipleUsers = async (usersData) => {
+  try {
+    const users = await User.insertMany(usersData);
+    return users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+2. Read Operations
+// Find all users
+const getAllUsers = async () => {
+  try {
+    const users = await User.find({});
+    return users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Find user by ID
+const getUserById = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Find users with conditions
+const getUsersByAge = async (minAge, maxAge) => {
+  try {
+    const users = await User.find({
+      age: { $gte: minAge, $lte: maxAge }
+    });
+    return users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Find with pagination
+const getUsersPaginated = async (page = 1, limit = 10) => {
+  try {
+    const skip = (page - 1) * limit;
+    const users = await User.find({})
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+    return users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+3. Update Operations
+// Update single document
+const updateUser = async (userId, updateData) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Update multiple documents
+const updateMultipleUsers = async (filter, updateData) => {
+  try {
+    const result = await User.updateMany(filter, updateData);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Update or create (upsert)
+const updateOrCreateUser = async (email, userData) => {
+  try {
+    const user = await User.findOneAndUpdate(
+      { email: email },
+      userData,
+      { new: true, upsert: true, runValidators: true }
+    );
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+4. Delete Operations
+// Delete by ID
+const deleteUser = async (userId) => {
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Delete multiple documents
+const deleteMultipleUsers = async (filter) => {
+  try {
+    const result = await User.deleteMany(filter);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Soft delete (mark as inactive)
+const softDeleteUser = async (userId) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isActive: false },
+      { new: true }
+    );
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+===============================================================================
+
+Query Operators
+
+1. Comparison Operators
+// Equal
+const usersWithAge25 = await User.find({ age: { $eq: 25 } });
+
+// Not equal
+const usersNotAge25 = await User.find({ age: { $ne: 25 } });
+
+// Greater than
+const usersOver18 = await User.find({ age: { $gt: 18 } });
+
+// Greater than or equal
+const usersOver18OrEqual = await User.find({ age: { $gte: 18 } });
+
+// Less than
+const usersUnder30 = await User.find({ age: { $lt: 30 } });
+
+// Less than or equal
+const usersUnder30OrEqual = await User.find({ age: { $lte: 30 } });
+
+// In array
+const usersWithSpecificAges = await User.find({ age: { $in: [20, 25, 30] } });
+
+// Not in array
+const usersWithoutSpecificAges = await User.find({ age: { $nin: [20, 25, 30] } });
+
+2. Logical Operators
+// AND
+const activeAdults = await User.find({
+  $and: [
+    { age: { $gte: 18 } },
+    { isActive: true }
+  ]
+});
+
+// OR
+const youngOrOld = await User.find({
+  $or: [
+    { age: { $lt: 18 } },
+    { age: { $gt: 65 } }
+  ]
+});
+
+// NOT
+const notActiveUsers = await User.find({
+  $not: { isActive: true }
+});
+
+// NOR
+const notYoungOrOld = await User.find({
+  $nor: [
+    { age: { $lt: 18 } },
+    { age: { $gt: 65 } }
+  ]
+});
+
+3. Element Operators
+// Exists
+const usersWithAge = await User.find({ age: { $exists: true } });
+
+// Type
+const usersWithNumberAge = await User.find({ age: { $type: 'number' } });
+
+===============================================================================
+
+Advanced Queries
+
+1. Text Search
+// Create text index first
+userSchema.index({ name: 'text', email: 'text' });
+
+// Search
+const searchUsers = await User.find({
+  $text: { $search: 'john' }
+});
+
+2. Aggregation Pipeline
+const getUserStats = async () => {
+  try {
+    const stats = await User.aggregate([
+      {
+        $match: { isActive: true }
+      },
+      {
+        $group: {
+          _id: null,
+          totalUsers: { $sum: 1 },
+          averageAge: { $avg: '$age' },
+          minAge: { $min: '$age' },
+          maxAge: { $max: '$age' }
+        }
+      }
+    ]);
+    return stats;
+  } catch (error) {
+    throw error;
+  }
+};
+
+3. Population (for referenced documents)
+// Schema with reference
+const postSchema = new mongoose.Schema({
+  title: String,
+  content: String,
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
+});
+
+// Populate reference
+const postsWithAuthors = await Post.find({}).populate('author');
+
+===============================================================================
+
+Best Practices
+
+1. Error Handling
+const handleDatabaseOperation = async (operation) => {
+  try {
+    const result = await operation();
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Database operation failed:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+2. Connection Management
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  await mongoose.connection.close();
+  console.log('MongoDB connection closed.');
+  process.exit(0);
+});
+
+3. Indexing
+// Create indexes for better performance
+userSchema.index({ email: 1 });
+userSchema.index({ age: 1 });
+userSchema.index({ name: 1, email: 1 }); // Compound index
+
+4. Validation
+// Custom validation
+userSchema.path('email').validate(async function(email) {
+  const user = await mongoose.models.User.findOne({ email });
+  if (user && user._id.toString() !== this._id.toString()) {
+    return false;
+  }
+  return true;
+}, 'Email already exists');
+
+5. Middleware (Hooks)
+// Pre-save middleware
+userSchema.pre('save', async function(next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
+});
+
+// Post-save middleware
+userSchema.post('save', function(doc, next) {
+  console.log('User saved:', doc.email);
+  next();
+});
+
+===============================================================================
+
+Express Route Examples
+
+1. User Routes
+// routes/users.js
+const express = require('express');
+const User = require('../models/User');
+const router = express.Router();
+
+// GET all users
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET user by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST create user
+router.post('/', async (req, res) => {
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// PUT update user
+router.put('/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// DELETE user
+router.delete('/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = router;
+
+===============================================================================
+
+Common Patterns and Tips
+
+1. Always use try-catch blocks for database operations
+2. Validate data before saving to database
+3. Use environment variables for sensitive configuration
+4. Create indexes for frequently queried fields
+5. Use populate for related data instead of manual joins
+6. Implement pagination for large datasets
+7. Use lean() for read-only operations to improve performance
+8. Handle connection errors gracefully
+9. Use transactions for operations requiring consistency
+10. Implement proper logging for debugging
+
+This documentation covers the essential MongoDB operations and patterns needed for MERN stack backend development. Keep this as a reference for your projects!
