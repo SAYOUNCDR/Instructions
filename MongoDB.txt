@@ -113,7 +113,6 @@ npm init -y
 
 // Install dependencies
 npm install express mongoose dotenv
-npm install -D nodemon
 
 2. Environment Configuration
 Create .env file:
