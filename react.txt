@@ -399,14 +399,230 @@ Note - can't we change the count value without setCount like count ++ ;
 React Portal:
 Portal is a feature that allows you to render a child component into a ODM node that exists outside the hierarchy of the parent component. This can be useful for scenarios like modals, tooltips or dropdowns , where you want to break out of the usual parent-child structure and render in different part of the DOM
 
-2:34:00
-- Quick Summary:
- --------------------------------------------------------------
-| Feature                |           Description                |
-|------------------------|------------------------------------- |
-| Vite Setup             | Fast React project setup             |
-| Component Structure    | Must start with Capital Letters      |
-| JSX Rules              | className, htmlFor differences       |
-| Props                  | Data passed from parent to child     |
-| List Rendering         | Using .map() with key prop           |
-| Conditional Rendering  | Dynamic UI based on logic/props      |
+Portals are majorly used for modals, tooltips and dropdowns
+
+Step 1. Add a div to main
+<body>
+  <div id="root"></div>
+  <div id="modal-root"></div> <!-- For Portals -->
+</body>
+
+Step 2. Create portal component
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+const Modal = ({ children }) => {
+  const modalRoot = document.getElementById('modal-root');
+  return ReactDOM.createPortal(
+    <div className="modal">{children}</div>,
+    modalRoot
+  );
+};
+
+export default Modal;
+
+
+Step 3. Import it and render using useState and &&
+import React, { useState } from 'react';
+import Modal from './Modal';
+
+function App() {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <div className="App">
+      <h1>Hello React</h1>
+      <button onClick={() => setShowModal(true)}>Open Modal</button>
+
+      {showModal && (
+        <Modal> // here its like passing props but diff htmlm as props 
+          <div className="modal-content">
+            <h2>I am a Portal Modal</h2>
+            <button onClick={() => setShowModal(false)}>Close</button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+
+// Copy to clipboard component
+import { useState } from "react";
+import { PopUpCopied } from "./PopUpCopied";
+
+export const CopyInput = () => {
+  const [inputValue, setIpnutValue] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(inputValue).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <div >
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setIpnutValue(e.target.value)}
+      />
+
+      <button onClick={handleCopy}>Copy text</button>
+      <PopUpCopied copied={copied} />
+    </div>
+  );
+};
+
+
+// that pop up - copied to clipboard
+
+export const PopUpCopied = ({ copied }) => {
+  return (
+    <div style={{ position: "relative", paddingBottom: "4rem" }}>
+      {copied && (
+        <div style={{ position: "absolute", bottom: "3rem" }}>
+          Copied to clipboard
+        </div>
+      )}
+    </div>
+  );
+};
+
+--- Prop Drilling -In React, prop drilling refers to the process of passing data from a parent component to deeply nested child components via intermediate components that do not necessarily need the data themselves.
+
+This leads to:
+- Verbose and repetitive code
+- Tightly coupled components
+- Difficult maintainability
+- Problems when state or data structures change
+
+When it becomes unmanageable, the preferred solutions are:
+- React Context API
+- State management libraries like Redux, Zustand, Jotai, etc.
+
+
+---ContextAPI - IT is feature that allows you to manage and share state across your component tree without having to pass props down manually at every level. 
+
+--- createContext(), useContext()
+
+
+CODE -
+-app.js <Parent />
+-Parent.js
+import { createContext } from "react";
+import { Child } from "./Child";
+
+export const DataContext = createContext();
+export const Parent = () => {
+  const user = {
+    name: "Sayoun",
+    age: 21,
+    email: "sayoun@example.com",
+  };
+  return (
+    //   Value passed from here i.e name
+    <DataContext.Provider value={user}>
+      <Child />
+    </DataContext.Provider>
+  );
+};
+
+-Child.js
+import { useContext } from "react";
+import { DataContext } from "./Parent";
+
+export const Child = () => {
+  const { name, age, email } = useContext(DataContext);
+
+  return (
+    <div>
+      <h2>Data received from Parent via Context:</h2>
+      <p>Name: {name}</p>
+      <p>Age: {age}</p>
+      <p>Email: {email}</p>
+    </div>
+  );
+};
+
+-- useReducer() - is a hook that is to useState, but it is designed for more complex state objects or states transitions that involves multiple sub values. It allows you to manage state in a functional , immutable way.
+
+Syntx -
+const [state, dispatch] = useReducer(reducer, initialState) 
+
+
+Code-
+import { useReducer } from "react";
+const initialState = { count: 0 };
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "increment":
+      return { ...state, count: state.count + 1 };
+    case "decrement":
+      return { ...state, count: state.count - 1 };
+    case "reset":
+      return { ...state, count: 0 };
+    default:
+      break;
+  }
+};
+
+export const Reducer = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <div>
+      <h1>Count: {state.count}</h1>
+      <button onClick={() => dispatch({ type: "increment" })}>+</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>-</button>
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
+    </div>
+  );
+};
+
+
+
+----useRef() - this hook provides a way to access and interact with DOM elements or to persist values across renders without causing a re-render.
+
+Syntx-
+const myRef = useRef(initialValue);
+
+
+-- Custom Hooks - These are JS functions that start with the prefix use(eg. useFetch, useForm etc) and can call other hooks within them. They allow you to extract and reuse logic that involves state or side effects, making your components more readable and maintainable. 
+
+ Example -
+
+const useFetch = (url)=>{
+	const [data, setData] = useState(null);
+	
+	useEffect(()=>{
+		fetch(url).then(res)=>res.json()).then((data)=>setData(data));
+			}, [url]);
+	return data;
+}
+
+
+//Inside another comp using useFetch
+ const [data] = useFetch("https://random-url.com/data);
+
+return (
+  <>
+    {data && data.map((item) => (
+      <ul key={item.id}>
+        <li>{item.name}</li>
+      </ul>
+    ))}
+  </>
+);
+
+
+
+//---------useId - It is a hook in react is used to generate unique IDs for components
+
+const id = uniqueId();
+
+
+
+3:56:00
+
