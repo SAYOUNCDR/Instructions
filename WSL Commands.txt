@@ -11,3 +11,26 @@ cd Users/Sayoun ( to get inside main user)
 -- to open windows explorer current location
  explorer.exe . (type this cmd inside the wsl)
 
+wsl --install -d Ubuntu
+
+
+// Linux cmd
+1. for making file and also inserting at same time
+cat >> sample2.txt (append)
+This file is sample 2 txt file
+Ctrl+D -> to exit
+
+2. cat sample2.txt -> prints all txt inside file on terminal
+
+3. cat > sample.txt -> replace txt inside txt file then ctrl+d
+
+4. cat sample.txt sample2.txt -> prints content of both files
+
+grep [OPTIONS] "pattern" file
+
+1. grep "Linux" sample.txt -> exact match
+2. grep -i "Linux" sample.txt -> ignore cases
+3. grep -v "linux" sample.txt -> non matching lines 
+4. grep -n "Linux" sample.txt -> show line number
+5. grep -r "Linux" sample.txt -> search recurseively in dir
+6. 

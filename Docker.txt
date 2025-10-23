@@ -1,0 +1,401 @@
+Docker  
+
+
+Problem Statement - Works on my machine not on your(due to not all tools and dependencies are installed or dependencies version mismatch)
+
+- It also happens that developer had used something associated with Linux os only but windows and mac wont be able to run that in their os.
+
+- In deployment in server/cloud while auto scaling repeatably installing all the tools/dependencies is head ache and tedious task containers make all that ez . 
+
+Solution - Wraps up all the dependencies/tools/os in a light weight container(VM) which on running can act as server
+
+
+
+Images - Standalone lightweight executable package
+
+
+
+1. Download/Installation 
+
+- Docker desktop - Docker CLI + GUI 
+
+- Docker Daemon (Actual thing that do all the work like pull , make images)
+
+
+
+2. Run ubuntu inside mac/windows
+
+
+a. docker -v  [To check the version of the docker]
+output - Docker version 28.4.0, build d8eb465
+
+
+b. docker run -it ubuntu [it satnds for interactive mode]
+output - unable to find image 
+then - downloads the image of ubuntu
+
+will go inside ubuntu inside the container (with ubuntu)
+
+real output - Unable to find image 'ubuntu:latest' locally
+latest: Pulling from library/ubuntu
+4b3ffd8ccb52: Pull complete
+Digest: sha256:66460d557b25769b102175144d538d88219c077c678a49af4afca6fbfc1b5252
+Status: Downloaded newer image for ubuntu:latest
+root@ef82f012dc9c:/#   [This cmd is inside container ubuntu]
+
+Note - Container are nothing it just a way to run the images 
+
+- The actual thing where os and all things(dependencies/tools) exist is image 
+- The same image can bew run on multiple continers
+- Containers are isolated (data inside each contnainer is diff i.e each continer ave thier own data) - can check by making folders on two containers both will have diff data - only image is shared(i.e ubunru no data)
+
+
+
+Note - In real development 
+ - Developers make their own image and can deploy in cloud
+	- Image: 
+		-Ubuntu
+		-Node
+		-MongoDb
+		-Redis
+
+
+Commmands- 
+      
+1. docker container ls / docker ps [list active and running containers]
+2. docker continer ps -a [list all container even if it's closed]
+3. docker start <container_name>  [starts particular container with specific name] 
+4. docker stop <container_name>  [stops particular container with specific name]
+5. docker rm <container_name_or_id> [deletes container only if its not running so first stop it]
+6. docker exec <container_name> cmd(like ls) [This runs ls cmd inside the container but detaches after running i.e giving output]
+7. docker exec -it <container_name> bash [Drop into an interactive shell to debug issues directly inside the container]
+8. docker run -it --name <container_name> <image_name> [start a container with given name from an image]
+
+
+Exec -
+
+1. docker exec myapp cat /var/log/app.log [See files/logs inside the container without stopping it]
+2. docker exec mydb mysql -uroot -psecret -e "SHOW DATABASES;" [Interact with services like MySQL/Postgres without installing clients locally]
+3. docker exec myapp printenv [Inspecting environment variables]
+4. docker exec myapp nginx -s reload [Reload or restart services inside container]
+
+
+Images-
+
+1. docker images [To see images]
+2. docker rmi <image_name_or_id> [deletes image only if no container is using this image fist delete container than image]
+3. NOTE - After renaming the image if you delete the image it will only delete remove the name , not actually deletes the image 
+	- under the hood images works as like that if you rename it  just points to same image i.e created as reference only reference got deleted not real image 
+	- to actually delete the image [docker rmi <image_id>
+
+Rename Images -
+
+	# Step 1: Pull ubuntu	
+	docker pull ubuntu:22.04
+	
+	# Step 2: Give it a friendly name for your project
+	docker tag ubuntu:22.04 sayoun/dev-base:1.0
+
+	# Step 3: Verify
+	docker images
+
+
+
+NOTE- Lets say if we run server in container at port localhost:8000 
+	- On typing localhost:8000 on browser it wont open the server 
+	- Cause the server is running inside the container on port 8000 
+	- We have to map to port which is inside the container to the machine outside the container
+
+
+Example -
+	- Run mailhog image in a container (mail server)
+	- It generally runs on port localhost:1025
+	- But when we type localhost:1025 it throws error cause the server is running inside the container on port 1025
+	- So port binding is required
+
+
+	- Final fix
+		- docker run -it -p <machine_port>:<container_port> <image_name>
+
+Note - Writing ENV codes inside Docker images are not recommended
+	- Pass env variables in image run cmd 
+	- docker run -it -p <machine_port>:<container_port> -e key=value -e key=value <image_name>
+		
+	  
+Example - Running a container using a custom made image
+		1. Make Dockerfile
+			FROM ubuntu:22.04
+			ENV DEBIAN_FRONTEND=noninteractive
+
+			RUN apt-get update && \
+    			apt-get install -y curl ca-certificates gnupg && \
+    			curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    			apt-get install -y nodejs && \
+    			apt-get clean && \
+    			rm -rf /var/lib/apt/lists/*
+
+			WORKDIR /app
+
+			COPY package*.json ./
+			RUN npm install 
+
+			COPY . .
+
+			CMD ["node", "index.js"]
+
+
+		2. Make image of the app
+			docker build -t <image_name> .  [dot means path of docker file i.e Dockerfile exist on same folder
+
+		3. Run image to make container 
+			NOTE -
+				- Port mapping only happens at the time of image running to make container 
+				- Container than will Have the port already mapped by image
+				- If want another port remove the container or make another container with other port mapping
+					docker rm <old_container_name>
+					docker run -p 4000:3000 <new_container_name>
+		4. If staring again don't need to make another container again 
+			- Just start the container
+				- docker container start <container_name>
+		5. If wanna go inside the running container and work on terminal
+			- docker exec -it <container_id/name> bash
+
+Caching Layer -
+		- Docker build caching is one of the most powerful performance features
+
+		- When you run:
+			- docker build -t myimage .
+			- Docker executes the Dockerfile top to bottom, layer by layer.
+
+		- Each instruction (FROM, RUN, COPY, ENV, etc.) creates an immutable layer.
+
+		- Docker checks before running each step:
+
+		“Do I already have a cached layer that was built with the exact same instruction + inputs?”
+				If yes → it reuses the cached layer.
+				If no → it invalidates the cache and re-runs that instruction and all following ones.
+
+Publish into hub -
+
+		1. Make acc in hub.docker
+		2. Make sure you are logged into the docker CLI
+		3. docker push <image_name>
+
+
+Docker compose: 
+		- Docker on steroids for multi-container apps
+		- Runs multi container-apps using a single YAML file (docker-compose.yml)
+
+
+```
+			 version: "3.9"
+			 services:
+ 		           db:
+    		             image: postgres:15
+           		     environment:
+      			       POSTGRES_PASSWORD: secret
+    			     volumes:
+      			       - db-data:/var/lib/postgresql/data
+
+  			   backend:
+    			     build: ./backend
+     			     ports:
+      			       - "5000:5000"
+    			     depends_on:
+      			       - db
+
+  			   frontend:
+    			     build: ./frontend
+    			     ports:
+       			       - "3000:3000"
+    			     depends_on:
+      			       - backend
+
+			   volumes:
+  			     db-data:
+
+```
+
+		- blueprint for all the containers your app needs: services, networks, volumes, configs everything
+		
+		- docker compose up
+		- docker compose up -d
+		- docker compose down [stop and remove containers and remove networks only]
+		- docker-compose down --rmi all
+		[Removes containers + images.]
+		[Keeps named volumes + networks intact.]
+		- When you docker-compose up again, your containers will use the same volume and network
+
+		- docker compose down --rmi all
+		[removes images also ]
+		
+		- docker compose down -v [stop + remove containers + remove networks + remove volumes]
+
+		- docker compose up --build -d [UP and Build in detach mode]
+
+
+
+Docker Networking:
+		
+		- Bridge (Default) Network and Host
+
+- Bridge [This is by default network]
+	- in this there is a bridge made between your host machine and container 
+
+
+CMD -
+		- docker network ls 
+		- docker network inspect <network_name> [will show all the containers connected with the network]
+			- docker network inspect bridge 
+			- It will show details of containers connected with the network like ips assigned and etc
+				- "Containers": {
+            				"90e222aa3e8bf8239ae323c21ee8f4b073e5ebf6da9154046414f822a79c4d0d": {
+                			"Name": "NetCont",
+                			"EndpointID": "5a100fb2b578dd0881bcad4a71db4800de059a7b35f90a55743df64d90ecee18",
+                			"MacAddress": "d6:32:a0:57:da:5d",
+                			"IPv4Address": "172.17.0.2/16",
+                			"IPv6Address": ""
+            						}
+        					},
+		
+
+
+
+
+- What is difference between bridge and host network then-
+	- Bridge network is default 
+	- In bridge network we have to map the port
+		- docker run -it -p 3000:3000 <image_name>
+
+	- Host network run on the machine host's same network so no need for port mapping
+		- docker run -it <image_name>
+
+
+
+
+
+
+- Making own network - 
+
+	- docker network create -d <mode> <network_name> [ Creates a network with a particular mode and name]
+	  Example -
+		  - docker network create -d bridge myNetwork
+
+
+
+- Making container with particular network 
+	- docker run -it --network=<netwrok_name> --name <container_name> -p 3000:3000 <image_name>
+
+Note : Containers running on same network i.e Made network not default like bridge or host (the made network can have bridge or host mode) can communicate with each other
+
+	Steps to verify: 
+		- First make 2 containers with different name but having same network 
+		- Update both os inside container first and install ping on that
+		- Start the containers and ping from one container to another 
+
+
+
+
+
+Volume Mounting - 
+	When we make a container, it has memory but when we destroy the container its memory also gets destroyed.
+		- To prevent this we have volume mounting 
+		
+CMD- 
+	- docker run -it -v <path_on_host_machine>:<path_on_container> image_name [This is explicit way of creating the mounting of volume]
+
+- There's better way of volume mounting 
+	- Create volume
+		- docker run -it --name=<contianer_name> --mount source=<vol_name>,target=/app <image_name>		 
+
+
+
+Docker Multi-Stage Build-
+
+- Used to optimize image size by separating build and runtime stages.
+
+- Each stage uses a FROM instruction.
+
+- Only the final stage is kept in the final image.
+
+- Reduces bloat (no build tools or temp files in production image).
+
+- Improves security, speed, and portability.
+
+	Example:
+
+		# Stage 1: Build
+		FROM node:20 AS builder
+		WORKDIR /app
+		COPY package*.json tsconfig*.json ./
+		RUN npm install
+		COPY . .
+		RUN npm run build # should run `tsc` or equivalent
+
+		# Stage 2: Run
+		FROM node:20-alpine
+		WORKDIR /app
+		COPY package*.json ./
+		RUN npm install --only=production
+
+		# Copy built files from builder
+		COPY --from=builder /app/dist ./dist
+		
+		# Run compiled JS
+		CMD ["node", "dist/index.js"]
+
+
+Key Points:
+
+AS builder → names the stage for reference.
+
+COPY --from=builder → copies built artifacts.
+
+Best for frontend (React/Vite) and backend builds (Node/Django).
+
+
+
+
+
+
+- Get inside the db of a conainer 
+	-> docker exec -it mongo_db mongosh
+	 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
