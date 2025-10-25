@@ -115,4 +115,254 @@ Benefits of This Architecture
 
 - Tools (Actions that host can perform via server)
 - Resources (Structured Data that host can access via server)
-- Prompts (Predefined queries that host can use via server)
+- Prompts (Predefined queries that host can use via servers offers to shape ai behavior)
+
+Example : How Prompt Premotives looks like for Github MCP Server
+
+{
+"name": "issue_report_prompt",
+"description": "Prompt to generate a report of open issues in a github repository",
+"message": [
+{
+"role": "system",
+"content": "You are a helpful assistant that generates reports of open issues in a github repository."
+},
+{
+"role": "user",
+"content": "Always include : Title, Steps to reproduce, Expected, Actual behavior, Labels, Assignee, Environment details"
+}
+],
+}
+
+Primitives- Standard Operations
+
+Tools :
+
+- tools/list - List all available tools in the MCP server
+- tools/call - Client tells server - Please perform this action with these parameters
+
+Resources :
+
+- resources/list - List all available resources in the MCP server
+- resources/read - Client says - "Give me the content of this resource with these parameters"
+- resources/subscribe/unsubscribe - Client subscribes or unsubscribes to resource updates"
+
+Prompts :
+
+- prompts/list - List all available prompts in the MCP server
+- prompt/use - Client fetches a specific prompt template from the MCP server to use in host-AI interactions
+
+![alt text](image.png)
+
+MCP Data Layer -
+
+- Data Layer is the language and grammar of the MCP ecosystem that everyone agrees upon to communicate.
+
+In MCP, JSON RPC 2.0 serves as the foundation of the data layer, providing a structured and standardized way for different components to interact seamlessly.
+
+JSON RPC 2.0 is a remote procedure call (RPC) protocol encoded in JSON.
+
+A Remote Procedure Call (RPC) allows a program to execute a function on another computer as if it were a local, hiding the details of the network communication and data transfer. This abstraction makes it easier to build distributed systems.
+
+Example: instead of writing add(2,3) locally, you send request to the server saying "Please execute add(2,3) on my behalf" and server returns the result 5.
+
+JSON RPC combines the concept of remote with the simplicity of json allowing developers to structure requests and responses in a standardized json format.
+
+Example JSON RPC:
+
+- Request:
+  {
+  "jsonrpc": "2.0",
+  "method": "add",
+  "params": [2, 3],
+  "id": 1
+  }
+
+- Response (if successful):
+  {
+  "jsonrpc": "2.0",
+  "result": 5,
+  "id": 1
+  }
+
+- Response (if error):
+  {
+  "jsonrpc": "2.0",
+  "error": {
+  "code": -32601,
+  "message": "Method not found"
+  },
+  "id": 1
+  }
+
+Lets see in different senarios how requests and responses look like in MCP ecosystem using JSON RPC 2.0
+
+1. Discovering Available Tools
+   Request:
+   {
+   "jsonrpc": "2.0",
+   "method": "tools/list",
+   "params": {},
+   "id": 1
+   }
+
+Response:
+{
+"jsonrpc": "2.0",
+"result": [
+{
+"name": "create_issue",
+"description": "Create a new issue in the repository",
+"parameters": {
+"title": "string",
+"description": "string"
+}
+},
+{
+"name": "list_issues",
+"description": "List all open issues in the repository",
+"parameters": {}
+}
+],
+"id": 1
+}
+
+2. Calling a Tool
+   Request:
+   {
+   "jsonrpc": "2.0",
+   "method": "tools/call",
+   "params": {
+   "tool_name": "create_issue",
+   "parameters": {
+   "title": "Bug in login feature",
+   "description": "Users are unable to log in using social media accounts."
+   }
+   },
+   "id": 2
+   }
+
+   Response:
+   {
+   "jsonrpc": "2.0",
+   "result": {
+   "issue_id": 123,
+   "status": "created"
+   },
+   "id": 2
+   }
+
+3. Listing Available Resources
+   Request:
+   {
+   "jsonrpc": "2.0",
+   "method": "resources/list",
+   "params": {},
+   "id": 3
+   }
+
+   Response:
+   {
+   "jsonrpc": "2.0",
+   "result": [
+   {
+   "name": "repository_info",
+   "description": "Information about the repository"
+   },
+   {
+   "name": "commit_history",
+   "description": "List of recent commits in the repository"
+   }
+   ],
+   "id": 3
+   }
+
+4. Reading a Resource
+   Request:
+   {
+   "jsonrpc": "2.0",
+   "method": "resources/read",
+   "params": {
+   "resource_name": "repository_info"
+   },
+   "id": 4
+   }
+   Response:
+   {
+   "jsonrpc": "2.0",
+   "result": {
+   "name": "MyRepo",
+   "owner": "User123",
+   "created_at": "2023-01-01T12:00:00Z
+   },
+   "id": 4
+   }
+
+5. Batching Multiple Requests [Request multiple operations in a single call]
+   Request:
+   [
+   {
+   "jsonrpc": "2.0",
+   "method": "tools/list",
+   "params": {},
+   "id": 5
+   },
+   {
+   "jsonrpc": "2.0",
+   "method": "resources/list",
+   "params": {},
+   "id": 6
+   }
+   ]
+
+   Response:
+   [
+   {
+   "jsonrpc": "2.0",
+   "result": [
+   {
+   "name": "create_issue",
+   "description": "Create a new issue in the repository",
+   "parameters": {
+   "title": "string",
+   "description": "string"
+   }
+   },
+   {
+   "name": "list_issues",
+   "description": "List all open issues in the repository",
+   "parameters": {}
+   }
+   ],
+   "id": 5
+   },
+   {
+   "jsonrpc": "2.0",
+   "result": [
+   {
+   "name": "repository_info",
+   "description": "Information about the repository"
+   },
+   {
+   "name": "commit_history",
+   "description": "List of recent commits in the repository"
+   }
+   ],
+   "id": 6
+   }
+   ]
+
+   6. Notification (fire and forget - no response expected)
+      Request:
+      {
+      "jsonrpc": "2.0",
+      "method": "file/updated",
+      "params": {
+      "file_path": "/path/to/updated/file.txt",
+      "name": "Alice",
+      "updated_by": "alice@example.com",
+      "timestamp": "2023-01-01T12:00:00Z"
+      }
+      }
+      Response:
+      (No response expected)
