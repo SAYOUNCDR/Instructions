@@ -24,6 +24,7 @@ When you ask an AI assistant to help with a task, it needs context. But that con
 - **Web resources** (APIs, databases)
 
 Manually gathering this information is:
+
 - ⏰ Time-consuming
 - ❌ Error-prone
 - 😫 Frustrating
@@ -59,7 +60,7 @@ An MCP system has two main components:
 ✅ **Faster problem-solving** - No manual context gathering  
 ✅ **More accurate AI responses** - Fresh, relevant information  
 ✅ **Reproducible results** - Consistent outputs across users  
-✅ **Scalable** - Add new data sources without changing your client  
+✅ **Scalable** - Add new data sources without changing your client
 
 ---
 
@@ -72,6 +73,7 @@ MCP servers expose three types of capabilities:
 Actions the client can request the server to perform.
 
 **Examples:**
+
 - `create_issue` - Create a new GitHub issue
 - `list_repos` - List all repositories
 - `send_message` - Send a Slack message
@@ -82,6 +84,7 @@ Actions the client can request the server to perform.
 Structured data the client can read or subscribe to.
 
 **Examples:**
+
 - `commit_history` - Recent git commits
 - `repository_info` - Repository metadata
 - `channel_messages` - Slack channel contents
@@ -91,6 +94,7 @@ Structured data the client can read or subscribe to.
 Pre-built prompt templates that shape how the AI responds.
 
 **Example prompt:**
+
 ```json
 {
   "name": "issue_report_prompt",
@@ -120,11 +124,12 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ✅ **Bidirectional** - Both client and server can initiate messages  
 ✅ **Transport agnostic** - Works over HTTP, WebSockets, stdin/stdout  
 ✅ **Supports batching** - Send multiple requests in one call  
-✅ **Notifications** - Fire-and-forget messages for events  
+✅ **Notifications** - Fire-and-forget messages for events
 
 ### Basic JSON-RPC Structure
 
 **Request:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -135,6 +140,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ```
 
 **Success Response:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -144,6 +150,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ```
 
 **Error Response:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -162,6 +169,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ### 1️⃣ Discovering Available Tools
 
 **Request:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -172,6 +180,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ```
 
 **Response:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -197,6 +206,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ### 2️⃣ Calling a Tool
 
 **Request:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -213,6 +223,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ```
 
 **Response:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -227,6 +238,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ### 3️⃣ Listing Available Resources
 
 **Request:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -237,6 +249,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ```
 
 **Response:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -257,6 +270,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ### 4️⃣ Reading a Resource
 
 **Request:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -269,6 +283,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 ```
 
 **Response:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -286,6 +301,7 @@ MCP uses **JSON-RPC 2.0** as its communication protocol. It's a simple, lightwei
 Send multiple operations in a single call to improve performance.
 
 **Request:**
+
 ```json
 [
   {
@@ -304,6 +320,7 @@ Send multiple operations in a single call to improve performance.
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -335,6 +352,7 @@ Send multiple operations in a single call to improve performance.
 Send messages without expecting a response. Perfect for events.
 
 **Request:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -362,11 +380,13 @@ When the MCP server runs on the same machine as the client:
 #### STDIO (Standard Input/Output) 🏆 Recommended
 
 **How it works:**
+
 1. The client launches the server as a subprocess
 2. Client writes JSON-RPC requests to the server's `stdin`
 3. Server reads messages, processes them, and writes responses to `stdout`
 
 **Why STDIO?**
+
 - ⚡ **Fast** - Direct process-to-process communication
 - 🔒 **Secure** - No network exposure
 - 🎯 **Simple** - Every programming language supports it
@@ -386,11 +406,13 @@ When the MCP server runs on a different machine:
 #### HTTP/HTTPS 🏆 Recommended
 
 **How it works:**
+
 1. Client sends HTTP POST requests with JSON-RPC payloads
 2. Server processes requests
 3. Server returns JSON-RPC responses in HTTP response body
 
 **Why HTTP/HTTPS?**
+
 - 🌐 **Universal** - Supported everywhere
 - 🚪 **Firewall-friendly** - Easy to configure
 - 🔐 **Secure** - Built-in TLS encryption
@@ -403,6 +425,7 @@ When the MCP server runs on a different machine:
 SSE extends HTTP to enable the server to push multiple messages to the client over a single connection.
 
 **Perfect for:**
+
 - Long-running tasks
 - Incremental updates
 - Streaming data chunks
@@ -412,6 +435,7 @@ Instead of waiting for one large response, the server streams data as it becomes
 #### WebSockets
 
 **When to use:**
+
 - Real-time, bidirectional communication
 - Interactive sessions
 - Low-latency requirements
@@ -423,6 +447,7 @@ Instead of waiting for one large response, the server streams data as it becomes
 ### Example 1: Engineer Implementing 2FA
 
 **Without MCP:**
+
 1. Open Jira to find related tickets
 2. Open GitHub to search code
 3. Search Slack for team discussions
@@ -430,6 +455,7 @@ Instead of waiting for one large response, the server streams data as it becomes
 5. Ask the AI for help
 
 **With MCP:**
+
 1. Ask the AI: "Help me implement 2FA"
 2. AI queries GitHub/Jira/Slack MCP servers automatically
 3. Servers return relevant context
@@ -438,12 +464,14 @@ Instead of waiting for one large response, the server streams data as it becomes
 ### Example 2: Daily AI Newsletter
 
 **MCP Setup:**
+
 - Product Hunt MCP Server → Latest products
 - ArXiv MCP Server → Research papers
 - Reddit MCP Server → Popular posts
 - Internal Notes MCP Server → Company updates
 
 **Process:**
+
 1. Each MCP server returns 2-3 relevant items
 2. AI composes a newsletter with sections:
    - Introduction
@@ -466,7 +494,7 @@ When implementing MCP servers, always follow these guidelines:
 🗝️ **Secret Management** - Store API keys securely, never in plain text  
 📝 **Audit Logging** - Track all actions performed through MCP  
 ✅ **Input Validation** - Validate all parameters before processing  
-🚫 **Rate Limiting** - Prevent abuse of your MCP servers  
+🚫 **Rate Limiting** - Prevent abuse of your MCP servers
 
 ---
 
@@ -484,16 +512,19 @@ When implementing MCP servers, always follow these guidelines:
 ### Standard Operations to Implement
 
 **Tools:**
+
 - `tools/list` - List available tools
 - `tools/call` - Execute a tool with parameters
 
 **Resources:**
+
 - `resources/list` - List available resources
 - `resources/read` - Fetch resource content
 - `resources/subscribe` - Subscribe to updates
 - `resources/unsubscribe` - Unsubscribe from updates
 
 **Prompts:**
+
 - `prompts/list` - List available prompt templates
 - `prompts/use` - Fetch and use a prompt template
 
@@ -501,16 +532,80 @@ When implementing MCP servers, always follow these guidelines:
 
 ## Why MCP is Better Than REST API
 
-| Feature | MCP (JSON-RPC) | REST API |
-|---------|---------------|----------|
-| **Overhead** | Minimal | More (headers, metadata) |
-| **Communication** | Bidirectional | Unidirectional |
-| **Transport** | Agnostic (HTTP, WS, stdio) | Primarily HTTP |
-| **Batching** | Built-in | Requires custom implementation |
-| **Notifications** | Native support | Not standard |
-| **Use Case** | Context exchange for AI | General web services |
+| Feature           | MCP (JSON-RPC)             | REST API                       |
+| ----------------- | -------------------------- | ------------------------------ |
+| **Overhead**      | Minimal                    | More (headers, metadata)       |
+| **Communication** | Bidirectional              | Unidirectional                 |
+| **Transport**     | Agnostic (HTTP, WS, stdio) | Primarily HTTP                 |
+| **Batching**      | Built-in                   | Requires custom implementation |
+| **Notifications** | Native support             | Not standard                   |
+| **Use Case**      | Context exchange for AI    | General web services           |
 
 ---
+
+## MCP LifeCycle:
+
+The MCP lifecycle describes the complete sequence of steps that govern how a host (client) and server establish, use, and end a connection during a session.
+
+1. **Initialization**: The host starts the MCP server, establishing a communication channel (e.g., STDIO, HTTP).
+
+2. **Operation**: The host and server exchange messages, with the host sending requests and the server responding. This phase continues for the duration of the session.
+
+3. **Shut down**: The host sends a termination signal to the server, which then cleans up resources and closes the communication channel.
+
+## Will do three Practices
+
+1. **Ready Made MCP client and server usage** : Client (Claude Desktop) and server (Already existing Google Drive MCP Server)
+
+- In this we will use 2 local MCP servers(file system and manim) and 1 remote MCP server (Google Drive and twitter MCP server)
+
+2. **Build own MCP Server** : Client (Claude Desktop) and server (Own MCP Server)
+3. **Build own MCP Client and Server** : Client (Own MCP Client) and server (Own MCP Server)
+
+Types of connections:
+
+1. Using config file - In this we have to manually add MCP server details in the config file of Claude Desktop.
+
+- Why config file?
+  - Easy to setup for tech savvy users
+  - More control over configurations
+  - Suitable for single MCP server management
+
+2. Using connectors - It is a built in feature of Claude Desktop where we can add multiple MCP servers using connectors.
+
+- Why connectors?
+  - Easy to use cause end users don't have to deal with config files and are not tech savvy
+  - No need to change config file again and again
+  - Easy to manage multiple MCP servers
+
+Why not connectors for all?
+
+- Connectors are offically built , hosted and maintained by Anthropic.
+- Anthropic may not have built connectors for all MCP servers cause there are many MCP servers available and will be more in future.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Summary
