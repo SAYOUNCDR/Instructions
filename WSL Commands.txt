@@ -33,4 +33,34 @@ grep [OPTIONS] "pattern" file
 3. grep -v "linux" sample.txt -> non matching lines 
 4. grep -n "Linux" sample.txt -> show line number
 5. grep -r "Linux" sample.txt -> search recurseively in dir
-6. 
+
+
+
+
+
+
+sudo adduser testdevusr
+su – testdevusr (to shift to that user)  
+
+
+
+
+User permission cmd:
+1.sudo usermod -aG sudo testdevusr - give user admin previlages
+2.sudo usermod -aG docker testdevusr - add testdevusr to docker group
+
+
+3. sudo groupadd devteam - create new group named devteam
+4. sudo usermod -aG devteam testdevusr - add user to user
+
+chown ownername filename
+chown :groupname filename
+
+chmod - for permissions
+
+777 user, group, others filename
+4 read
+2 write
+1 execute
+
+chmod 770 devopsfile.txt - Make file readable by everyone, writable only by owner 

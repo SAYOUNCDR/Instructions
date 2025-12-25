@@ -1,0 +1,117 @@
+\! cls - clear psql terminal
+\l - list all dbs
+SELECT datname FROM pg_database; - this will list names of databases
+CREATE database <db_name> - this will make a new db
+
+
+
+\c <database_name> - to connect with a database
+
+
+
+-CREATE table
+
+
+CREATE TABLE STUDENTS (
+    ID INT PRIMARY KEY,
+    NAME VARCHAR(100),
+    AGE INT,
+    COURSE VARCHAR(100)
+); 
+
+
+
+- Insert 
+INSERT INTO STUDENTS (ID, NAME, AGE, COURSE)
+VALUES
+(2, 'Aarav Das', 20, 'Mechanical Engineering'),
+(3, 'Riya Sen', 22, 'Electrical Engineering'),
+(4, 'Arjun Patel', 19, 'Civil Engineering');
+
+
+- fetch
+SELECT * FROM STUDENTS;
+
+
+- update
+UPDATE STUDENTS
+SET AGE = 23,
+    COURSE = 'Computer Science'
+WHERE ID = 3;
+
+
+-delete
+DELETE FROM STUDENTS
+WHERE ID = 1;
+
+
+- add new col
+ALTER TABLE STUDENTS
+ADD COLUMN EMAIL VARCHAR(150);
+
+
+
+- add data in updated col in particular row with where clause
+UPDATE STUDENTS
+SET EMAIL = 'sayoun@example.com'
+WHERE ID = 2;
+
+
+
+
+
+---- TASK ----
+CREATE DATABASE records;
+
+
+
+CREATE TABLE student_details (
+    regno INT PRIMARY KEY,
+    name VARCHAR(100),
+    dep VARCHAR(100),
+    course VARCHAR(100)
+);
+
+ALTER TABLE student_details
+ADD COLUMN marks INT;
+
+INSERT INTO student_details (regno, name, dep, course, marks)
+VALUES
+(101, 'Sayoun Parui', 'CSE', 'Data Structures', 92),
+(102, 'Riya Sen', 'ECE', 'Digital Systems', 85);
+
+
+
+CREATE TABLE employee_details (
+    emp_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    dep VARCHAR(100),
+    salary DECIMAL(10,2)
+);
+INSERT INTO employee_details (emp_id, name, dep, salary)
+VALUES
+(1, 'Aarav Das', 'IT', 60000.00),
+(2, 'Arjun Patel', 'HR', 45000.00);
+
+
+UPDATE employee_details
+SET salary = 75000.00,
+    dep = 'Engineering'
+WHERE emp_id = 1;
+
+
+
+SELECT * FROM student_details;
+SELECT * FROM employee_details;
+
+
+
+
+
+
+
+
+
+
+
+

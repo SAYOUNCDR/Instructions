@@ -1,0 +1,118 @@
+Running Multiple Express Apps on a Single Azure VM using Nginx Reverse Proxy
+
+
+Useful Commands
+---------------
+
+Reload Nginx
+sudo nginx -s reload
+
+SSH into the VM
+ssh -i <private-key-file-path> azureuser@vm_ip
+
+
+What Are We Building
+--------------------
+
+We are setting up two Express (Node.js) applications running on a single Azure VM,
+exposed via Nginx reverse proxy using domain-based routing.
+
+
+Architecture Overview
+---------------------
+
+- One Azure VM
+- Two Express apps
+- One Nginx server
+- Two domains pointing to the same VM IP
+- Nginx routes traffic based on domain name
+
+
+Step 0: Domain Setup (DNS)
+--------------------------
+
+At your domain provider (e.g. Namecheap):
+
+demo01.sayoun.studio
+- Record Type: A
+- Value: VM Public IP
+
+demo02.sayoun.studio
+- Record Type: A
+- Value: Same VM Public IP
+
+Both domains point to the same VM.
+
+
+Step 1: Create Two Node.js Apps Inside the VM
+---------------------------------------------
+
+- demo01 app runs on: localhost:3000
+- demo02 app runs on: localhost:3001
+
+Each app is started separately inside the VM.
+
+
+Step 2: Configure Nginx Reverse Proxy
+-------------------------------------
+
+Nginx Config File Location:
+/etc/nginx/nginx.conf
+
+Edit the config:
+sudo nano /etc/nginx/nginx.conf
+
+Replace the contents with the following configuration.
+
+Note:
+- demo01 Node app -> localhost:3000
+- demo02 Node app -> localhost:3001
+
+
+Nginx Configuration
+-------------------
+
+events {
+  # Event directives ...
+}
+
+http {
+
+  server {
+    listen 80;
+    server_name demo01.sayoun.studio;
+
+    location / {
+      proxy_pass http://localhost:3000;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection 'upgrade';
+      proxy_set_header Host $host;
+      proxy_cache_bypass $http_upgrade;
+    }
+  }
+
+  server {
+    listen 80;
+    server_name demo02.sayoun.studio;
+
+    location / {
+      proxy_pass http://localhost:3001;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection 'upgrade';
+      proxy_set_header Host $host;
+      proxy_cache_bypass $http_upgrade;
+    }
+  }
+
+}
+
+
+Result
+------
+
+- http://demo01.sayoun.studio -> served by demo01 Express app
+- http://demo02.sayoun.studio -> served by demo02 Express app
+- Both apps run simultaneously on the same VM
+- Nginx handles routing based on domain name
