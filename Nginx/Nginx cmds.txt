@@ -116,3 +116,36 @@ Result
 - http://demo02.sayoun.studio -> served by demo02 Express app
 - Both apps run simultaneously on the same VM
 - Nginx handles routing based on domain name
+
+
+
+
+
+
+
+
+Note: When SSH terminal got closed the running node/react process will also gets stops 
+
+Solution : Process manager comes into picture like pm2 which runs the node/react apps on background even if ssh terminal is closed 
+
+
+Frequently used commands:
+
+pm2 start index.js  [Start a process]
+
+pm2 start index.js --name <name> [start a process with particular name]
+
+pm2 start npm --name demo01 -- start [When your app starts via npm start]
+
+pm2 start index.js -i max [Cluster mode. Uses all CPU cores. Mandatory for production.]
+
+pm2 start index.js -i 2 [Explicit cluster size.]
+
+
+
+[Stop and remove all process]
+pm2 stop all
+pm2 delete all
+
+
+
