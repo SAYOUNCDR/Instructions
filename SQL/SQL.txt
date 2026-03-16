@@ -1,0 +1,14 @@
+# Create DB command
+CREATE DATABASE <db_name>;
+
+# To use a particular DB
+use <dn_name>;
+
+# To delete a particular db 
+DROP DATABASE <db_name>;
+
+# Make Db readonly
+ALTER DATABASE <db_name> READ ONLY = 1;
+
+# Make Db noraml
+ALTER DATABASE <db_name> READ ONLY = 0;

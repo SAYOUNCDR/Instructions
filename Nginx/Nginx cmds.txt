@@ -1,11 +1,29 @@
 Running Multiple Express Apps on a Single Azure VM using Nginx Reverse Proxy
 
 
+sudo apt-get install -y curl
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+sudo apt install nginx -y
+
+
+# Start and enable Nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+# Check status
+sudo systemctl status nginx
+
+
 Useful Commands
 ---------------
 
 Reload Nginx
 sudo nginx -s reload
+
+Test Nginx files is correct or not (best practice to run after every nginx file save)
+sudo nginx -t 
 
 SSH into the VM
 ssh -i <private-key-file-path> azureuser@vm_ip
@@ -17,7 +35,7 @@ What Are We Building
 We are setting up two Express (Node.js) applications running on a single Azure VM,
 exposed via Nginx reverse proxy using domain-based routing.
 
-
+	 	
 Architecture Overview
 ---------------------
 
@@ -146,6 +164,17 @@ pm2 start index.js -i 2 [Explicit cluster size.]
 [Stop and remove all process]
 pm2 stop all
 pm2 delete all
+
+
+
+permission for serving static index file with nginx
+# 1. Allow Nginx to pass through your user folders
+chmod +x /home/azureuser
+chmod +x /home/azureuser/projects
+chmod +x /home/azureuser/projects/okunix
+
+# 2. Give Nginx read access to the actual build folder and files
+chmod -R 755 /home/azureuser/projects/okunix/client-dist
 
 
 
