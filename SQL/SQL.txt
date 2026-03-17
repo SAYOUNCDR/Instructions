@@ -12,3 +12,212 @@ ALTER DATABASE <db_name> READ ONLY = 1;
 
 # Make Db noraml
 ALTER DATABASE <db_name> READ ONLY = 0;
+
+# Create Table
+CREATE TABLE <table_name> (
+	id INT,
+	first_name VARCHAR(50),
+	description VARCHAR(255),
+	hourly_pay  DECIMAL(5,2),
+	hire_date DATE
+)
+
+# Rename table
+RENAME TABLE <old_table_name> TO <new_table_name>
+
+# To show all data in a table 
+SELECT * FROM <table_name>
+
+------ Working with Columns ---------
+
+# Edit table i.e add new col
+ALTER TABLE <table_name> ADD <col_name> <col_datatype>
+
+# Rename a column
+ALTER TABLE <table_name> RENAME COLUMN <old_colname> TO <new_colname>
+
+# Chnage the datatype for a Column 
+ALTER TABLE <table_name> MODIFY COLUMN <col_name_who_datatype_needs _to_change> <new_datatype>
+
+
+# Move the position of a column in the table after a particular col
+ALTER TABLE <table_name> MODIFY <col_name_which_needs_to_shift> <its_datatype> AFTER <col_name_after_which_the_col_wants_to_be_moved>
+
+# Move the col to as first col
+ALTER TABLE <table_name> MODIFY <col_name_which_needs_to_shift> <its_datatype> FIRST
+
+
+# Delete a column
+ALTER TABLE <table_name> DROP COLUMN <col_name>
+
+
+
+--------- Working with rows -------------
+
+# Insert a single row 
+INSERT INTO <table_name> VALUES (
+ <col_datas_in_order>
+)
+
+
+example- 
+INSERT INTO employee VALUES(
+	1, "Jhon", "Doe" , 105.25, "2025-01-15", "doe@gmail.com"
+)
+
+
+
+# Insert multiple rows 
+INSERT INTO <table_name> VALUES 
+ (first_row), (second_row), (third_row), (fourth_row), (and so on)
+
+
+
+example- 
+INSERT INTO employee VALUES
+    (2, 'Sara', 'doe', 23.67, '2025-01-14', 'sara@gmail.com'),
+    (3, 'Sung', 'Wung', 29.70, '2025-01-18', 'sung@gmail.com'),
+    (4, 'Ram', 'Singh', 93.45, '2025-01-25', 'ram@gmail.com');
+
+
+# Insert data into specific columns
+INSERT INTO <table_name> (<col1>, <col2>, <col3>) VALUES
+ (<col1_data>, <col2_data>, <col3_data>)
+
+
+example-
+INSERT INTO employee (id, first_name, last_name) VALUES
+ (5, 'Rohit', 'Sharma'),
+ (6, 'Sonia', 'Gupta'),
+ (7, 'Rahul', 'Verma');
+
+
+ # Query to show all data in a table
+SELECT * FROM <table_name>
+
+# Query to show specific columns in a table
+SELECT <col1>, <col2>, <col3> FROM <table_name>
+
+# Query to show specific rows in a table
+SELECT * FROM <table_name> WHERE <condition>
+
+example 1-
+SELECT * FROM employee WHERE hourly_pay > 50.00;
+
+example 2-
+SELECT * FROM employee WHERE hourly_pay BETWEEN 50.00 AND 100.00 AND hire_date > '2025-01-20';
+
+example 3- lets find all employees whose hire_date and hourly_pay are not set  
+SELECT * FROM employee WHERE hourly_pay IS NULL AND hire_date IS NULL;
+
+
+# Side Quests- Lets learn some operators
+
+# Logical Operators
+AND, OR, NOT
+
+# Comparison Operators
+=, !=, <, >, <=, >=
+
+# Arithmetic Operators
++, -, *, /, %
+
+# String Operators - one of the most used operators in SQL
+LIKE, IN, NOT IN, IS NULL, IS NOT NULL
+
+
+----- UPDATE and DELETE commands ---------
+
+# Update a row in a table
+UPDATE <table_name> SET <col_name> = <new_value> WHERE <condition>
+
+example - update a single column
+UPDATE employee SET hourly_pay = 110.00 WHERE id = 1;
+
+example - update multiple columns
+UPDATE employee SET hourly_pay = 120.00, hire_date = '2025-01-20' WHERE id = 5;
+
+
+
+Faaaaah - command - delete all rows in a table
+DELETE FROM <table_name> - don't do this unless you want to lose all your data
+
+Bonus - Comments in SQL
+/* DELETE FROM employee  */
+
+# Delete specific rows in a table
+DELETE FROM <table_name> WHERE <condition>
+
+example -
+DELETE FROM employee WHERE id = 7;
+
+
+--- Theory time ---
+
+# Tf is Auto-Commit?
+Auto-Commit is a feature in SQL that automatically saves changes to the database after each individual statement is executed. 
+This means that once a statement is executed, the changes are immediately permanent and cannot be rolled back.
+
+# Why is Auto-Commit important? 
+Auto-Commit is important because it ensures that changes to the database are saved immediately, which can help prevent data loss in case of unexpected errors or crashes.
+However, it can also lead to unintended consequences if not used carefully, as it may commit changes that were not intended to be permanent.
+
+
+# How to disable Auto-Commit?
+To disable Auto-Commit, you can use the following command:
+SET autocommit = OFF;
+
+# How to enable Auto-Commit?
+To enable Auto-Commit, you can use the following command:
+SET autocommit = ON;
+
+
+# What is a Transaction?
+A transaction is a sequence of one or more SQL statements that are executed as a single unit of work.
+
+
+
+-- To save a commit point 
+COMMIT;
+
+-- To rollback to a commit point
+ROLLBACK;
+
+Note- If auto-commit is disabled every transaction will be pending until commit
+	COMMIT
+
+
+
+-- Dates and time in SQL
+
+# Date time and datetime datatype
+DATE- stores only date in the format 'YYYY-MM-DD'
+DATETIME- stores both date and time in the format 'YYYY-MM-DD HH:MM:
+TIME- stores only time in the format 'HH:MM:SS'
+
+
+example-
+CREATE TABLE events (
+	id INT,
+	event_name VARCHAR(50),
+	event_date DATE,
+	event_time TIME,
+	event_datetime DATETIME
+)
+
+# To insert date and time data into a table
+INSERT INTO events VALUES (
+	1, 'Birthday Party', '2025-01-15', '18:00:00', '2025-01-15 18:00:00'
+)
+
+# Some date and time functions in SQL
+CURRENT_DATE() - returns the current date
+CURRENT_TIME() - returns the current time
+CURRENT_TIMESTAMP() or NOW() - returns the current date and time
+
+
+example-
+
+INSERT INTO events VALUES (
+	2, 'Conference', CURRENT_DATE(), CURRENT_TIME(), NOW()
+)
