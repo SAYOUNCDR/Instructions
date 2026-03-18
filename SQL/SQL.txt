@@ -270,3 +270,234 @@ CREATE TABLE employees (
 
 - The CONSTRAINT keyword is used to give a name to the check constraint, which can be useful for reference and maintenance purposes.
 here chk_hourly_pay is the name of the check constraint that ensures that the hourly_pay column only allows values greater than 10.
+
+
+# Update column to add a check constraint
+ALTER TABLE employees
+ADD CONSTRAINT chk_hourly_pay CHECK (hourly_pay > 10)
+
+# To drop a check constraint
+ALTER TABLE employees
+DROP CONSTRAINT chk_hourly_pay
+
+
+# Default constraint in SQL
+A default constraint is a database constraint that provides a default value for a column when no value is specified during an insert operation.
+example-
+CREATE TABLE orders (
+	id INT,
+	order_date DATE DEFAULT CURRENT_DATE(),
+	status VARCHAR(20) DEFAULT 'Pending'
+)
+
+# Add default constraint to an existing column
+ALTER TABLE orders
+ALTER COLUMN status SET DEFAULT 'Pending'
+
+# To drop a default constraint
+ALTER TABLE orders
+ALTER COLUMN status DROP DEFAULT
+
+
+# Primary key constraint in SQL
+A primary key constraint is a database constraint that uniquely identifies each record in a table. 
+It consists of one or more columns that must contain unique values and cannot be null.
+
+example-
+CREATE TABLE customers (
+	id INT PRIMARY KEY,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50)
+)
+
+# To add a primary key constraint to an existing column
+ALTER TABLE customers
+ADD PRIMARY KEY (id)
+
+# To drop a primary key constraint
+ALTER TABLE customers
+DROP PRIMARY KEY
+
+
+
+----- Attributes in SQL ---------
+# Auto Increment attribute in SQL
+example-
+CREATE TABLE users (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	username VARCHAR(50),
+	email VARCHAR(100)
+)
+
+# To add auto increment attribute to an existing column
+ALTER TABLE users
+MODIFY id INT AUTO_INCREMENT
+
+# To drop auto increment attribute from a column
+ALTER TABLE users
+MODIFY id INT
+
+
+
+
+
+
+---- Foreign Key constraint in SQL
+A foreign key constraint is a database constraint that establishes a relationship between two tables by linking a column in one table (the child table) to a column in another table (the parent table).
+example-
+CREATE TABLE departments (
+	id INT PRIMARY KEY,
+	department_name VARCHAR(50)
+)
+
+CREATE TABLE employees (
+	id INT PRIMARY KEY,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	department_id INT,
+	FOREIGN KEY (department_id) REFERENCES departments(id)
+)
+
+# Give a name to the foreign key constraint
+CREATE TABLE employees (
+	id INT PRIMARY KEY,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	department_id INT,
+	CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES departments(id)
+)
+
+# To add a foreign key constraint to an existing column
+ALTER TABLE employees
+ADD FOREIGN KEY (department_id) REFERENCES departments(id)
+
+# To drop a foreign key constraint
+ALTER TABLE employees
+DROP FOREIGN KEY <foreign_key_name>
+
+
+# Joins
+1. Inner Join - returns only the rows that have matching values in both tables. If there is no match, the row is not included in the result set. i.e only the rows that have a match in both tables will be included in the result set, and if there is no match, the row will be excluded from the result set.
+2. Left Join - returns all the rows from the left table and the matching rows from the right table. If there is no match, the result is NULL on the right side. i.e all rows from the left table will be included in the result set, and if there is no match in the right table, the columns from the right table will contain NULL values.
+3. Right Join - returns all the rows from the right table and the matching rows from the left table. If there is no match, the result is NULL on the left side. i.e all rows from the right table will be included in the result set, and if there is no match in the left table, the columns from the left table will contain NULL values.
+4. Full Outer Join - returns all the rows when there is a match in either left or right table. If there is no match, the result is NULL on the side that does not have a match. i.e all rows from both tables will be included in the result set, and if there is no match in either table, the columns from that table will contain NULL values.
+
+
+Create two tables- customers and orders
+
+CREATE TABLE customers (
+	id INT PRIMARY KEY,
+	first_name VARCHAR(50) NOT NULL,
+	last_name VARCHAR(50)
+)
+
+CREATE TABLE orders (
+	id INT PRIMARY KEY,
+	order_date DATE,
+	order_amount DECIMAL(10,2),
+	customer_id INT,
+	FOREIGN KEY (customer_id) REFERENCES customers(id)
+)
+
+# Inner Join example
+SELECT customers.first_name, customers.last_name, orders.order_date, orders.order_amount
+FROM customers INNER JOIN orders ON customers.id = orders.customer_id;
+
+# Left Join example
+SELECT customers.first_name, customers.last_name, orders.order_date, orders.order_amount
+FROM customers LEFT JOIN orders ON customers.id = orders.customer_id;
+
+# Right Join example
+SELECT customers.first_name, customers.last_name, orders.order_date, orders.order_amount
+FROM customers RIGHT JOIN orders ON customers.id = orders.customer_id;
+
+# Full Outer Join example - this will not work in MySQL as it does not support full outer join, but in other databases like PostgreSQL or SQL Server it will work
+SELECT customers.first_name, customers.last_name, orders.order_date, orders.order_amount
+FROM customers FULL OUTER JOIN orders ON customers.id = orders.customer_id;
+
+
+
+
+--- Function in SQL
+# Aggregate functions in SQL
+1. COUNT() - returns the number of rows that match a specified condition.
+SELECT COUNT(*) FROM customers WHERE first_name = 'John' AS john_count - this return number of rows that match the condition
+SELECT COUNT(order_amount) FROM orders WHERE order_amount IS NOT NULL AS non_null_order_amounts - this return number of non-null values in the specified column that match the condition
+
+
+2. SUM() - returns the total sum of a numeric column.
+SELECT SUM(order_amount) FROM orders AS total_sales - this return the total sum of the order_amount column
+SELECT SUM(order_amount) FROM orders WHERE order_date >= '2025-01-01' AND order_date <= '2025-01-31' AS january_sales - this return the total sum of the order_amount column for orders placed in January 2025
+
+3. AVG() - returns the average value of a numeric column.
+SELECT AVG(order_amount) FROM orders AS average_order_amount - this return the average value of the order_amount column
+SELECT AVG(order_amount) FROM orders WHERE order_date >= '2025-01-01' AND order_date <= '2025-01-31' AS average_january_order_amount - this return the average value of the order_amount column for orders placed in January 2025
+
+4. MIN() - returns the minimum value of a column.
+SELECT MIN(order_amount) FROM orders AS minimum_order_amount - this return the minimum value of the order_amount column
+SELECT MIN(order_amount) FROM orders WHERE order_date >= '2025-01-01' AND order_date <= '2025-01-31' AS minimum_january_order_amount - this return the minimum value of the order_amount column for orders placed in January 2025
+
+5. MAX() - returns the maximum value of a column.
+SELECT MAX(order_amount) FROM orders AS maximum_order_amount - this return the maximum value of the order_amount column
+SELECT MAX(order_amount) FROM orders WHERE order_date >= '2025-01-01' AND order_date <= '2025-01-31' AS maximum_january_order_amount - this return the maximum value of the order_amount column for orders placed in January 2025
+
+# Scalar functions in SQL
+1. UPPER() - converts a string to uppercase.
+SELECT UPPER(first_name) FROM customers AS uppercase_first_name;
+
+2. LOWER() - converts a string to lowercase.
+SELECT LOWER(last_name) FROM customers AS lowercase_last_name;
+
+3. LENGTH() - returns the length of a string.
+SELECT LENGTH(first_name) FROM customers AS first_name_length;
+
+4. NOW() - returns the current date and time.
+SELECT NOW() AS current_datetime;
+
+5. DATE() - extracts the date part from a datetime value.
+SELECT DATE(order_date) FROM orders AS order_date_only;
+
+6. CONCAT() - concatenates two or more strings into one string.
+SELECT CONCAT(first_name, ' ', last_name) FROM customers AS full_name;
+
+NOTE- 
+
+AS keyword is used to give an alias to a column or a table in SQL. An alias is a temporary name that can be used to refer to a column or a table in a query.
+example-
+SELECT first_name AS fname, last_name AS lname FROM customers;
+
+
+
+-- Logical Operators in SQL
+1. AND - returns true if both conditions are true.
+SELECT * FROM customers WHERE first_name = 'John' AND last_name = 'Doe';
+
+2. OR - returns true if at least one of the conditions is true.
+SELECT * FROM customers WHERE first_name = 'John' OR last_name = 'Doe';
+
+3. NOT - returns true if the condition is false.
+SELECT * FROM customers WHERE NOT first_name = 'John';
+
+4. IN - returns true if a value matches any value in a list.
+SELECT * FROM customers WHERE first_name IN ('John', 'Jane', 'Doe');
+
+
+-- Wild card characters in SQL
+1. % - represents zero or more characters.
+SELECT * FROM customers WHERE first_name LIKE 'J%'; - this will return all customers whose first name starts with 'J'
+
+SELECT * FROM customers WHERE first_name LIKE '%n'; - this will return all customers whose first name ends with 'n'
+
+SELECT * FROM customers WHERE first_name LIKE '%oh%'; - this will return all customers whose first name contains 'oh' anywhere in the name
+
+2. _ - represents a single character.
+SELECT * FROM customers WHERE first_name LIKE 'J_n'; - this will return all customers whose first name starts with 'J', followed by any single character, and ends with 'n' (e.g.,  'Jan', 'Jen')
+
+SELECT * FROM customers WHERE first_name LIKE '_ohn'; - this will return all customers whose first name has any single character followed by 'ohn' (e.g., 'John', 'Kohn', 'Lohn')
+
+SELECT * FROM customers WHERE first_name LIKE 'J__n'; - this will return all customers whose first name starts with 'J', followed by any two characters, and ends with 'n' (e.g., 'John', 'Jann', 'Jenn')
+
+
+NOTE - We can use both % and _ wildcards together in a LIKE pattern to create more complex search criteria. For example:
+
+SELECT * FROM employee where first_name like "_aa%"; - this will return all employees whose first name has any single character followed by 'aa' and then any sequence of characters (e.g., 'Saara', 'Raahul', 'Kaashif')
