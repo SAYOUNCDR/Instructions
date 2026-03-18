@@ -221,3 +221,52 @@ example-
 INSERT INTO events VALUES (
 	2, 'Conference', CURRENT_DATE(), CURRENT_TIME(), NOW()
 )
+
+------- Constraints in SQL ---------
+
+# Unique constraint in SQL
+A unique constraint is a database constraint that ensures that all values in a column or a group of columns are unique across the entire table.
+example-
+CREATE TABLE users (
+	id INT,
+	username VARCHAR(50),
+	email VARCHAR(100) UNIQUE
+)
+
+- In this email columns will not allow duplicate values
+
+# Not null constraint in SQL
+A not null constraint is a database constraint that ensures that a column cannot have a null value.
+example-
+CREATE TABLE products (
+	id INT,
+	product_name VARCHAR(50) NOT NULL,
+	price DECIMAL(10,2) NOT NULL
+)
+
+In this product_name and price columns will not allow null values
+
+
+# Check constraint in SQL
+A check constraint is a database constraint that ensures that the values in a column meet a specific condition.
+example-
+CREATE TABLE employees (
+	id INT,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	hourly_pay DECIMAL(5,2) CHECK (hourly_pay > 10)
+)
+
+In this hourly_pay column will only allow values greater than 
+
+# Exmaple of named check constraint
+CREATE TABLE employees (
+	id INT,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	hourly_pay DECIMAL(5,2),
+	CONSTRAINT chk_hourly_pay CHECK (hourly_pay > 10)
+)
+
+- The CONSTRAINT keyword is used to give a name to the check constraint, which can be useful for reference and maintenance purposes.
+here chk_hourly_pay is the name of the check constraint that ensures that the hourly_pay column only allows values greater than 10.
