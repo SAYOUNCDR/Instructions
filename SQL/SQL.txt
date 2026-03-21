@@ -501,3 +501,53 @@ SELECT * FROM customers WHERE first_name LIKE 'J__n'; - this will return all cus
 NOTE - We can use both % and _ wildcards together in a LIKE pattern to create more complex search criteria. For example:
 
 SELECT * FROM employee where first_name like "_aa%"; - this will return all employees whose first name has any single character followed by 'aa' and then any sequence of characters (e.g., 'Saara', 'Raahul', 'Kaashif')
+
+
+
+
+// Ordder BY clause in SQL
+The ORDER BY clause is used to sort the result set of a query in either ascending (ASC) or descending (DESC) order based on one or more columns.
+example-
+SELECT * FROM customers ORDER BY first_name ASC; - this will return all customers sorted by their first name in ascending order (A to Z)
+SELECT * FROM customers ORDER BY last_name DESC; - this will return all customers sorted by their last name in descending order (Z to A)
+
+
+// use order by with multiple columns
+SELECT * FROM orders ORDER BY amount DESC, order_date ASC; - this will return all orders sorted by amount in descending order, and if there are multiple orders with the same amount, they will be sorted by order date in ascending order.
+
+// Limit clause in SQL
+The LIMIT clause is used to specify the maximum number of rows to return in a result set.
+example-
+SELECT * FROM customers LIMIT 5; - this will return the first 5 rows
+
+SELECT * FROM customers ORDER BY id ASC LIMIT 5; - this will return the first 5 rows sorted by id in ascending order
+
+//  what is offset in Limit clause?
+The OFFSET clause is used in conjunction with the LIMIT clause to specify the number of rows to skip before starting to return rows from the query result. 
+It is often used for pagination purposes, allowing you to retrieve a specific subset of rows from a larger result set.
+example-
+SELECT * FROM customers ORDER BY id ASC LIMIT 10, 10 ; - this will skip the first 20 rows and return the next 10 rows
+
+like first page shows rows 1-10, second page shows rows 11-20, third page shows rows 21-30 and so on
+
+
+// Union and Union All in SQL
+1. UNION - combines the result sets of two or more SELECT statements and returns only distinct rows from the combined result set.
+
+// note - both tables must have the same number of columns and compatible data types for the corresponding columns in the SELECT statements.
+example- 
+SELECT first_name FROM customers
+UNION
+SELECT product_name FROM products; - this will return a combined list of first names from the customers table and product names from the products table, but only distinct values will be included in the result set.
+
+
+2. UNION ALL - combines the result sets of two or more SELECT statements and returns all rows from the combined result set, including duplicates.
+example-
+SELECT first_name FROM customers 
+UNION ALL
+SELECT product_name FROM products; - this will return a combined list of first names from the customers table and product names from the products table, including all duplicates in the result set.
+
+
+// self join in SQL
+A self join is a type of join that allows you to join a table to itself. 
+It is used when you want to compare rows within the same table or when you want to retrieve related data from the same table.
