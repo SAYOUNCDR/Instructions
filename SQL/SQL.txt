@@ -551,3 +551,16 @@ SELECT product_name FROM products; - this will return a combined list of first n
 // self join in SQL
 A self join is a type of join that allows you to join a table to itself. 
 It is used when you want to compare rows within the same table or when you want to retrieve related data from the same table.
+
+example-
+CREATE TABLE employees (
+	id INT PRIMARY KEY,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	manager_id INT,
+	FOREIGN KEY (manager_id) REFERENCES employees(id)
+)
+
+SELECT e1.first_name AS employee_name, e2.first_name AS manager_name
+FROM employees e1
+LEFT JOIN employees e2 ON e1.manager_id = e2.id; - this will return a list of employees along with their managers' names. If an employee does not have a manager (i.e., manager_id is NULL), the manager_name will be returned as NULL in the result set.
